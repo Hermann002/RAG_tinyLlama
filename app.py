@@ -13,12 +13,12 @@ st.caption("this app allows you to chat with document create by expert in data e
 if 'history' not in st.session_state:
     st.session_state.history = []
     
-embeddings = OllamaEmbeddings(model="tinyllama")
+embeddings = OllamaEmbeddings(model="llama3")
 
 
 def ollama_llm(question, context):
     formatted_prompt = f"question: {question}\n\n context: {context}"
-    response = ollama.chat(model="tinyllama", messages=[{'role': 'user', "content": formatted_prompt}])
+    response = ollama.chat(model="llama3", messages=[{'role': 'user', "content": formatted_prompt}])
     return response['message']['content']
 
 
