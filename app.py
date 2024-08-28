@@ -37,17 +37,7 @@ if webpage_url:
     docs = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=10)
     splits = text_splitter.split_documents(docs)
-
-    
-    client = Client()
-    # collection = client.get_or_create_collection(name="my_collection")
     vectorStore = Chroma.from_documents(documents=splits, embedding=embeddings)
-    # vectorStore = Chroma(client=client, embedding_function=embeddings, collection_name="my_collection")
-    # vectorStore.add_texts(splits)
-
-    
-    
-    # Rag Setup
     retriever = vectorStore.as_retriever()
 
     

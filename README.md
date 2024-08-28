@@ -4,5 +4,5 @@
 1. clone the repo
 2. install the required packages by running `pip install -r requirements.txt`
 3. install ollama https://ollama.com
-4. Run ```ollama pull tinyllama```
+4. Run `ollama pull tinyllama`
 5. Run `streamlit run app.py`
