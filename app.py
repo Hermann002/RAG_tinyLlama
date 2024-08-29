@@ -12,25 +12,10 @@ st.caption("this app allows you to chat with document create by expert in data e
 
 if 'history' not in st.session_state:
     st.session_state.history = []
-    
-embeddings = OllamaEmbeddings(model="llama3")
-
-
-def ollama_llm(question, context):
-    formatted_prompt = f"question: {question}\n\n context: {context}"
-    response = ollama.chat(model="llama3", messages=[{'role': 'user', "content": formatted_prompt}])
-    return response['message']['content']
-
-
-def combine_docs(docs):
-        return "\n\n".join(doc.page_content for doc in docs)
-        
-def rag_chain(question):
-    retrieved_docs = retriever.invoke(question)
-    formatted_context = combine_docs(retrieved_docs)
-    return ollama_llm(question, formatted_context)
 
 webpage_url = st.text_input("Enter webpage URL", type="default")
+
+embeddings = OllamaEmbeddings(model="llama3")
 
 if webpage_url:
     loader = WebBaseLoader(webpage_url)
@@ -40,7 +25,20 @@ if webpage_url:
     vectorStore = Chroma.from_documents(documents=splits, embedding=embeddings)
     retriever = vectorStore.as_retriever()
 
-    
+    def ollama_llm(question, context):
+        formatted_prompt = f"question: {question}\n\n context: {context}"
+        response = ollama.chat(model="llama3", messages=[{'role': 'user', "content": formatted_prompt}])
+        return response['message']['content']
+
+
+    def combine_docs(docs):
+            return "\n\n".join(doc.page_content for doc in docs)
+            
+    def rag_chain(question):
+        retrieved_docs = retriever.invoke(question)
+        formatted_context = combine_docs(retrieved_docs)
+        return ollama_llm(question, formatted_context)
+
     st.success(f"load {webpage_url} succesfully !")
 
 prompt = st.text_input("ask any question about the webpage")
