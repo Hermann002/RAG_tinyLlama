@@ -6,10 +6,24 @@ from langchain_community.embeddings import OllamaEmbeddings
 
 embeddings = OllamaEmbeddings(model="llama3")
 
-webpage_url = input("Enter webpage URL")
+while True:
+    try:
+        vectorStore = Chroma(persist_directory="./vector_store_db", embedding_function=embeddings)
 
-loader = WebBaseLoader(webpage_url)
-docs = loader.load()
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=10)
-splits = text_splitter.split_documents(docs)
-vectorStore = Chroma.from_documents(documents=splits, embedding=embeddings, persist_directory="./vector_store_db")
+        pdf_path = input("Enter pdf path ")
+
+        loader = WebBaseLoader(pdf_path)
+        docs = loader.load()
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=10)
+        splits = text_splitter.split_documents(docs)
+        vectorStore_ = Chroma.from_documents(documents=splits, embedding=embeddings, persist_directory="./vector_store_db")
+        vectorStore.add_documents(vectorStore_)
+    except Exception as e:
+        print(e)
+    pdf_path = input("Enter pdf path ")
+
+    loader = WebBaseLoader(pdf_path)
+    docs = loader.load()
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=10)
+    splits = text_splitter.split_documents(docs)
+    vectorStore = Chroma.from_documents(documents=splits, embedding=embeddings, persist_directory="./vector_store_db")
