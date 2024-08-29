@@ -29,4 +29,5 @@ prompt = st.text_input("ask any question about the webpage")
 
 if prompt:
     result = rag_chain(prompt)
+    st.write(retriever)
     st.write(result)
