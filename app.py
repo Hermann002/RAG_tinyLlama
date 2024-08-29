@@ -7,7 +7,7 @@ st.title("Chat with Documents")
 st.caption("this app allows you to chat with document create by expert in data engineering")
 
 embeddings = OllamaEmbeddings(model="llama3")
-vectorStore = Chroma(persist_directory="./vector_store_db", embedding=embeddings)
+vectorStore = Chroma(persist_directory="./vector_store_db", embedding_function=embeddings)
 retriever = vectorStore.as_retriever()
 
 def ollama_llm(question, context):
