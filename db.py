@@ -3,7 +3,7 @@ from decouple import config
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_mistralai.embeddings import MistralAIEmbeddings
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from mistralai import Mistral

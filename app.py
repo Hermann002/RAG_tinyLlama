@@ -5,7 +5,7 @@ from decouple import config
 from mistralai import Mistral
 
 import streamlit as st
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_mistralai.embeddings import MistralAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from mistralai import Mistral
@@ -13,12 +13,13 @@ from mistralai import Mistral
 st.title("Chat with Documents")
 st.caption("this app allows you to chat with document create by expert in data engineering")
 
+try:
+    os.environ.pop('MISTRAL_API_KEY')
+except Exception:
+     pass
 api_key = config('MISTRAL_API_KEY')
-os.environ['MISTRAL_API_KEY'] = api_key
-os.environ['HF_TOKEN'] = config("HF_TOKEN")
 
 client = Mistral(api_key=api_key)
-
 # embeddings = MistralAIEmbeddings(model="mistral-embed", mistral_api_key=api_key)
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
