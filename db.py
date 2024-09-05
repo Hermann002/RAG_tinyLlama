@@ -1,39 +1,40 @@
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
-from langchain_chroma import Chroma
-from langchain_community.embeddings import OllamaEmbeddings
+import os
+from decouple import config
 
-embeddings = OllamaEmbeddings(model="llama3")
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_mistralai.embeddings import MistralAIEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from mistralai import Mistral
+
+
+api_key = config("MISTRAL_API_KEY")
+os.environ['HF_TOKEN'] = config("HF_TOKEN")
+
+# embeddings = OllamaEmbeddings(model="llama3")
+embeddings = MistralAIEmbeddings(model="mistral-embed", mistral_api_key=api_key)
+
+client = Mistral(api_key=api_key)
 
 def vector_docs(pdf_path):
+
     loader = PyPDFLoader(pdf_path)
     docs = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=10)
-    splits = text_splitter.split_documents(docs)
-    vectorStore = Chroma.from_documents(documents=splits, embedding=embeddings, persist_directory="./vector_store_db")
-
+    documents = text_splitter.split_documents(docs)
+    
+    try:
+        vectorStore = FAISS.load_local("faiss.index", embeddings, allow_dangerous_deserialization=True)
+        vectorStore.add_documents(documents=documents)
+        vectorStore.save_local("faiss.index")
+        print("Création d'une nouvelle base de données vectorielle")
+    except Exception as e:
+        vectorStore = FAISS.from_documents(documents, embeddings)
+        vectorStore.save_local("faiss.index")
+        print("Ajout des données à la base de données vectorielle")
     return vectorStore
 
 while True:
-    
-    vectorStore = Chroma(persist_directory="./vector_store_db", embedding_function=embeddings)
-
     pdf_path = input("Enter pdf path ")
-
-    vectorStore.add_documents(vector_docs(pdf_path))
-
-
-# from langchain.text_splitter import RecursiveCharacterTextSplitter
-# from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
-# from langchain_chroma import Chroma
-# from langchain_community.embeddings import OllamaEmbeddings
-
-# embeddings = OllamaEmbeddings(model="llama3")
-
-# webpage_url = input("Enter webpage URL")
-
-# loader = WebBaseLoader(webpage_url)
-# docs = loader.load()
-# text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=10)
-# splits = text_splitter.split_documents(docs)
-# vectorStore = Chroma.from_documents(documents=splits, embedding=embeddings, persist_directory="./vector_store_db")
+    
+    print(vector_docs(pdf_path))
