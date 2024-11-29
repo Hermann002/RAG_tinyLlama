@@ -1,3 +1,5 @@
 env/
 Modelfile
 vector_store_db/
+
+.env
